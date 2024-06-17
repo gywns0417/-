@@ -78,13 +78,17 @@ class OrderApp:
             self.update_ui()
 
     def increase_quantity(self, product_name):
+        entry_widget = self.entry_widgets[product_name]
+        self.set_quantity_entry(product_name, entry_widget)
         self.items[product_name] += 1
         self.update_ui()
 
     def decrease_quantity(self, product_name):
+        entry_widget = self.entry_widgets[product_name]
+        self.set_quantity_entry(product_name, entry_widget)
         if self.items[product_name] > 0:
             self.items[product_name] -= 1
-            self.update_ui()
+        self.update_ui()
 
     def set_quantity(self, product_name):
         quantity = simpledialog.askinteger("입력", f"{product_name} 의 주문 수량을 입력하쎄엠")
@@ -129,6 +133,7 @@ class OrderApp:
             if isinstance(widget, tk.Entry):
                 widget.destroy()
 
+        self.entry_widgets = {}
         row = 1
         for product_name, quantity in self.items.items():
             tk.Label(self.frame, text=product_name).grid(row=row, column=0, padx=10, pady=5)
@@ -138,6 +143,9 @@ class OrderApp:
             quantity_entry.insert(0, str(quantity))
             quantity_entry.bind("<Return>", lambda e, pn=product_name: self.set_quantity_entry(pn, quantity_entry))
             quantity_entry.grid(row=row, column=2, padx=5)
+            quantity_entry.bind("<FocusOut>", lambda e, pn=product_name: self.set_quantity_entry(pn, quantity_entry))
+
+            self.entry_widgets[product_name] = quantity_entry
 
             tk.Button(self.frame, text="+", command=lambda pn=product_name: self.increase_quantity(pn)).grid(row=row, column=3, padx=5)
             tk.Button(self.frame, text="상품 제거", command=lambda pn=product_name: self.remove_product(pn)).grid(row=row, column=4, padx=5)
@@ -157,4 +165,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = OrderApp(root)
     root.mainloop()
-
